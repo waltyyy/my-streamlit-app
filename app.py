@@ -84,8 +84,8 @@ try:
                  'F_MOBILE', 'F_NOINT', 'F_NOHSDP', 'F_NOVEH', 'F_PCI', 'F_POV',
                  'F_SNGPNT', 'F_UNEMP', 'E_HU', 'M_HU', 'F_TOTAL'
              ]
-
-     st.write(f"Model expects {len(feature_names)} features.") # Show the count
+try:
+    st.write(f"Model expects {len(feature_names)} features.") # Show the count
      # st.write(f"Features: {', '.join(feature_names[:10])}...") # Optionally show a few names
 
     except NameError:
