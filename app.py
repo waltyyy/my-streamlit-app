@@ -84,13 +84,11 @@ try:
                  'F_MOBILE', 'F_NOINT', 'F_NOHSDP', 'F_NOVEH', 'F_PCI', 'F_POV',
                  'F_SNGPNT', 'F_UNEMP', 'E_HU', 'M_HU', 'F_TOTAL'
              ]
-try:
-    st.write(f"Model expects {len(feature_names)} features.") # Show the count
-     # st.write(f"Features: {', '.join(feature_names[:10])}...") # Optionally show a few names
-
-    except NameError:
-        st.error("Error: Could not determine expected feature names.")
-        st.stop()
+             try:
+                 st.write(f"Model expects {len(feature_names)} features.") # Show the count
+             except NameError:
+                 st.error("Error: Could not determine expected feature names.")
+                 st.stop()
     except Exception as e:
         st.error(f"An unexpected error occurred getting feature names: {e}")
         st.stop()
