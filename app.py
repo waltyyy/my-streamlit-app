@@ -68,22 +68,7 @@ try:
              # For this demo, we'll hardcode a subset as a fallback
              st.warning("Could not get feature names from X. Using a hardcoded placeholder list.")
              # Replace with actual feature names from your data preprocessing
-             feature_names = [
-                 'E_PCI', 'M_PCI', 'E_HD', 'M_HD', 'E_HSEHLD', 'M_HSEHLD', 'E_NOVEH',
-                 'M_NOVEH', 'E_AGE65', 'M_AGE65', 'E_AGE17', 'M_AGE17', 'E_DISABL',
-                 'M_DISABL', 'E_SNGPNT', 'M_SNGPNT', 'E_MINRTY', 'M_MINRTY', 'E_LIMENG',
-                 'M_LIMENG', 'EP_PCI', 'EP_HD', 'EP_HSEHLD', 'EP_NOVEH', 'EP_AGE65',
-                 'EP_AGE17', 'EP_DISABL', 'EP_SNGPNT', 'EP_MINRTY', 'EP_LIMENG',
-                 'E_UNEMP', 'M_UNEMP', 'EP_UNEMP', 'E_POV', 'M_POV', 'EP_POV',
-                 'E_NOHSDP', 'M_NOHSDP', 'EP_NOHSDP', 'E_GROUPQ', 'M_GROUPQ', 'EP_GROUPQ',
-                 'E_MUNIT', 'M_MUNIT', 'EP_MUNIT', 'E_MOBILE', 'M_MOBILE', 'EP_MOBILE',
-                 'E_CROWD', 'M_CROWD', 'EP_CROWD', 'E_NOINT', 'M_NOINT', 'EP_NOINT',
-                 'E_COREF', 'M_COREF', 'EP_COREF', 'RPL_THEMES', 'RPL_THEME1',
-                 'RPL_THEME2', 'RPL_THEME3', 'RPL_THEME4', 'F_THEMES', 'F_AGED',
-                 'F_CROWD', 'F_DISABL', 'F_GROUPQ', 'F_HH', 'F_LIMENG', 'F_MINRTY',
-                 'F_MOBILE', 'F_NOINT', 'F_NOHSDP', 'F_NOVEH', 'F_PCI', 'F_POV',
-                 'F_SNGPNT', 'F_UNEMP', 'E_HU', 'M_HU', 'F_TOTAL'
-             ]
+             feature_names = ['Condition', 'Condition_TotalPop', 'F_TOTAL', 'RPL_Themes', 'TotalPopulation']
              try:
                  st.write(f"Model expects {len(feature_names)} features.") # Show the count
              except NameError:
