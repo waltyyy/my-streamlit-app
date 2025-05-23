@@ -60,11 +60,11 @@ elif option == 'CSV Upload':
 
 # --- Prediction and Visualization ---
 if input_df is not None:
-    st.subheader("📊 Input Data Used for Prediction")
+    st.subheader("Input Data Used for Prediction")
     st.write(input_df[feature_names])
 
     # --- Visualization ---
-    st.subheader("📈 Input Data Visualization")
+    st.subheader("Input Data Visualization")
     try:
         if input_df.shape[0] > 1:
             st.markdown("Distribution of features (for CSV Upload):")
@@ -86,7 +86,7 @@ if input_df is not None:
     # --- Prediction ---
     try:
         prediction = model.predict(input_df[feature_names])
-        st.subheader("🧠 Prediction")
+        st.subheader("Prediction")
         st.write(prediction)
 
         # Prediction Probabilities
@@ -96,12 +96,12 @@ if input_df is not None:
                 proba_df = pd.DataFrame(prediction_proba, columns=model_classes)
             else:
                 proba_df = pd.DataFrame(prediction_proba)
-            st.subheader("📊 Prediction Probability")
+            st.subheader("Prediction Probability")
             st.write(proba_df)
 
         # --- Performance Evaluation if true labels exist ---
         if 'Quintile_Category' in input_df.columns:
-            st.subheader("📈 Model Performance on Input Data")
+            st.subheader("Model Performance on Input Data")
             true_labels = input_df['Quintile_Category']
             predicted_labels = prediction
 
