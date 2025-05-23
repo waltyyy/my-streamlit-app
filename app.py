@@ -8,7 +8,6 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 # --- Load trained model pipeline ---
 try:
     model_pipeline = joblib.load('best_model.pkl')
-    st.success("Model pipeline loaded successfully!")
     try:
         model_classes = model_pipeline.named_steps['classifier'].classes_
     except AttributeError:
