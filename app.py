@@ -5,14 +5,14 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-# --- Load trained model pipeline ---
+# --- Load trained model ---
 try:
-    model_pipeline = joblib.load('best_model_pipeline.pkl')
-    st.success("Model pipeline loaded successfully!")
+    model = joblib.load('best_model_pipeline.pkl')
+    st.success("Model loaded successfully!")
     try:
-        model_classes = model_pipeline.named_steps['classifier'].classes_
+        model_classes = model.classes_
     except AttributeError:
-        st.warning("Could not retrieve class names from the classifier.")
+        st.warning("Could not retrieve class names from the model.")
         model_classes = None
 except FileNotFoundError:
     st.error("Error: 'best_model_pipeline.pkl' not found. Please upload the model file.")
@@ -22,18 +22,14 @@ except Exception as e:
     st.stop()
 
 # --- Define expected feature names ---
-try:
-    feature_names = ['Condition', 'Condition_TotalPop', 'F_TOTAL', 'RPL_Themes', 'TotalPopulation']
-    st.info(f"Model expects {len(feature_names)} features.")
-except Exception as e:
-    st.error(f"Error initializing feature names: {e}")
-    st.stop()
+feature_names = ['Condition', 'Condition_TotalPop', 'F_TOTAL', 'RPL_Themes', 'TotalPopulation']
+st.info(f"Model expects {len(feature_names)} features: {', '.join(feature_names)}")
 
 # --- Title and Input Method ---
 st.title("Social Vulnerability Classification")
 option = st.radio("Choose input method:", ('Manual Input', 'CSV Upload'))
 
-input_df = None  # Initialize input_df
+input_df = None
 
 # --- Manual Input ---
 if option == 'Manual Input':
@@ -43,9 +39,8 @@ if option == 'Manual Input':
     for i, feature in enumerate(feature_names):
         with cols[i % 3]:
             manual_inputs[feature] = st.number_input(f"{feature}", value=0.0, step=0.01, format="%.2f")
-
     if st.button("Predict"):
-        input_df = pd.DataFrame([manual_inputs], columns=feature_names)
+        input_df = pd.DataFrame([manual_inputs])
 
 # --- CSV Upload ---
 elif option == 'CSV Upload':
@@ -63,16 +58,16 @@ elif option == 'CSV Upload':
         input_df = df_uploaded.copy()
         st.success("CSV validated. Using required features for prediction.")
 
-# --- Show input summary and visualize ---
+# --- Prediction and Visualization ---
 if input_df is not None:
     st.subheader("📊 Input Data Used for Prediction")
     st.write(input_df[feature_names])
 
-    # Visualization
+    # --- Visualization ---
     st.subheader("📈 Input Data Visualization")
     try:
         if input_df.shape[0] > 1:
-            st.markdown("Showing distribution of features (for CSV Upload):")
+            st.markdown("Distribution of features (for CSV Upload):")
             sns.set(style="whitegrid")
             fig = sns.pairplot(input_df[feature_names])
             st.pyplot(fig)
@@ -88,15 +83,15 @@ if input_df is not None:
     except Exception as e:
         st.warning(f"Could not generate visualization: {e}")
 
-    # --- Make Prediction ---
+    # --- Prediction ---
     try:
-        prediction = model_pipeline.predict(input_df[feature_names])
+        prediction = model.predict(input_df[feature_names])
         st.subheader("🧠 Prediction")
         st.write(prediction)
 
-        # Show prediction probabilities if available
-        if hasattr(model_pipeline.named_steps['classifier'], 'predict_proba'):
-            prediction_proba = model_pipeline.predict_proba(input_df[feature_names])
+        # Prediction Probabilities
+        if hasattr(model, 'predict_proba'):
+            prediction_proba = model.predict_proba(input_df[feature_names])
             if model_classes is not None:
                 proba_df = pd.DataFrame(prediction_proba, columns=model_classes)
             else:
@@ -104,7 +99,7 @@ if input_df is not None:
             st.subheader("📊 Prediction Probability")
             st.write(proba_df)
 
-        # --- Evaluate if true labels exist ---
+        # --- Performance Evaluation if true labels exist ---
         if 'Quintile_Category' in input_df.columns:
             st.subheader("📈 Model Performance on Input Data")
             true_labels = input_df['Quintile_Category']
@@ -120,7 +115,7 @@ if input_df is not None:
             plt.xlabel("Predicted Label")
             plt.ylabel("True Label")
             st.pyplot(fig)
-            plt.close(fig)
+            plt.close()
         else:
             st.info("No true labels (`Quintile_Category`) found in the input. Only predictions shown.")
 
