@@ -117,20 +117,22 @@ elif option == 'CSV Upload':
         st.write("Uploaded Data Preview:")
         st.write(df_uploaded.head()) # Show head instead of whole df
 
-uploaded_cols = df_uploaded.columns.tolist()
-if sorted(uploaded_cols) != sorted(feature_names): # Sort columns for comparison
-    st.error(f"Error: Uploaded CSV columns do not match expected model features (ignoring order).")
-    st.write(f"Expected: {', '.join(sorted(feature_names))}")
-    st.write(f"Uploaded: {', '.join(sorted(uploaded_cols))}")
-    st.stop() # Stop if columns don't match
+        # Validate uploaded CSV columns against expected features
+        uploaded_cols = df_uploaded.columns.tolist()
+        if sorted(uploaded_cols) != sorted(feature_names): # Sort columns for comparison
+            st.error(f"Error: Uploaded CSV columns do not match expected model features (ignoring order).")
+            st.write(f"Expected: {', '.join(sorted(feature_names))}")
+            st.write(f"Uploaded: {', '.join(sorted(uploaded_cols))}")
+            st.stop() # Stop if columns don't match
 
-# Reorder uploaded DataFrame columns to match the model's expected order
-try:
-    input_df = df_uploaded[feature_names]
-    st.success("CSV columns validated and ordered.")
-except KeyError as e:
-    st.error(f"Error reordering columns. Missing column: {e}")
-    st.stop()
+        # Reorder uploaded DataFrame columns to match the model's expected order
+        try:
+            input_df = df_uploaded[feature_names]
+            st.success("CSV columns validated and ordered.")
+        except KeyError as e:
+             st.error(f"Error reordering columns. Missing column: {e}")
+             st.stop()
+
 
 # If input_df was created (either manually or via upload)
 if input_df is not None:
