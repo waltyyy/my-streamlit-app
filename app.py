@@ -60,13 +60,13 @@ elif option == 'CSV Upload':
             st.error(f"Missing required columns: {', '.join(missing_cols)}")
             st.stop()
 
-        input_df = df_uploaded[feature_names]
-        st.success("CSV validated. Using only required features.")
+        input_df = df_uploaded.copy()
+        st.success("CSV validated. Using required features for prediction.")
 
 # --- Show input summary and visualize ---
 if input_df is not None:
     st.subheader("📊 Input Data Used for Prediction")
-    st.write(input_df)
+    st.write(input_df[feature_names])
 
     # Visualization
     st.subheader("📈 Input Data Visualization")
@@ -74,13 +74,13 @@ if input_df is not None:
         if input_df.shape[0] > 1:
             st.markdown("Showing distribution of features (for CSV Upload):")
             sns.set(style="whitegrid")
-            fig = sns.pairplot(input_df)
+            fig = sns.pairplot(input_df[feature_names])
             st.pyplot(fig)
             plt.close()
         else:
             st.markdown("Bar chart of individual input (for Manual Input):")
             fig, ax = plt.subplots()
-            input_df.T.plot(kind='bar', legend=False, ax=ax)
+            input_df[feature_names].T.plot(kind='bar', legend=False, ax=ax)
             plt.xticks(rotation=45)
             plt.ylabel("Value")
             st.pyplot(fig)
@@ -90,13 +90,13 @@ if input_df is not None:
 
     # --- Make Prediction ---
     try:
-        prediction = model_pipeline.predict(input_df)
+        prediction = model_pipeline.predict(input_df[feature_names])
         st.subheader("🧠 Prediction")
         st.write(prediction)
 
         # Show prediction probabilities if available
         if hasattr(model_pipeline.named_steps['classifier'], 'predict_proba'):
-            prediction_proba = model_pipeline.predict_proba(input_df)
+            prediction_proba = model_pipeline.predict_proba(input_df[feature_names])
             if model_classes is not None:
                 proba_df = pd.DataFrame(prediction_proba, columns=model_classes)
             else:
@@ -104,30 +104,25 @@ if input_df is not None:
             st.subheader("📊 Prediction Probability")
             st.write(proba_df)
 
+        # --- Evaluate if true labels exist ---
+        if 'Quintile_Category' in input_df.columns:
+            st.subheader("📈 Model Performance on Input Data")
+            true_labels = input_df['Quintile_Category']
+            predicted_labels = prediction
+
+            acc = accuracy_score(true_labels, predicted_labels)
+            st.write(f"**Accuracy on Input Data:** {acc:.2f}")
+
+            cm = confusion_matrix(true_labels, predicted_labels)
+            fig, ax = plt.subplots()
+            sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax,
+                        xticklabels=model_classes, yticklabels=model_classes)
+            plt.xlabel("Predicted Label")
+            plt.ylabel("True Label")
+            st.pyplot(fig)
+            plt.close(fig)
+        else:
+            st.info("No true labels (`Quintile_Category`) found in the input. Only predictions shown.")
+
     except Exception as e:
-        st.error(f"An error occurred during prediction: {e}")
-
-    # --- Show Performance Metrics ---
-    st.subheader("📈 Model Performance on Test Data")
-    try:
-        X_test = joblib.load("X_test.pkl")
-        y_test = joblib.load("y_test.pkl")
-        y_test_pred = model_pipeline.predict(X_test)
-
-        acc = accuracy_score(y_test, y_test_pred)
-        cm = confusion_matrix(y_test, y_test_pred)
-
-        st.write(f"**Accuracy on Test Set:** {acc:.2f}")
-
-        fig, ax = plt.subplots()
-        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax,
-                    xticklabels=model_classes, yticklabels=model_classes)
-        plt.xlabel("Predicted Label")
-        plt.ylabel("True Label")
-        st.pyplot(fig)
-        plt.close(fig)
-
-    except FileNotFoundError:
-        st.warning("Test data files (X_test.pkl and y_test.pkl) not found.")
-    except Exception as e:
-        st.error(f"An error occurred while calculating performance metrics: {e}")
+        st.error(f"An error occurred during prediction or evaluation: {e}")
