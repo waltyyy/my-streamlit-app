@@ -46,8 +46,6 @@ if option == 'Manual Input':
 
     if st.button("Predict"):
         input_df = pd.DataFrame([manual_inputs], columns=feature_names)
-        st.write("Input Data:")
-        st.write(input_df)
 
 # --- CSV Upload ---
 elif option == 'CSV Upload':
@@ -57,23 +55,43 @@ elif option == 'CSV Upload':
         st.write("Uploaded Data Preview:")
         st.write(df_uploaded.head())
 
-        # Check for missing required features
         missing_cols = [col for col in feature_names if col not in df_uploaded.columns]
         if missing_cols:
             st.error(f"Missing required columns: {', '.join(missing_cols)}")
             st.stop()
 
-        # Keep only required features, ignore extras
         input_df = df_uploaded[feature_names]
         st.success("CSV validated. Using only required features.")
-        st.write("Filtered Input Data:")
-        st.write(input_df)
 
-# --- Make Prediction ---
+# --- Show input summary and visualize ---
 if input_df is not None:
+    st.subheader("📊 Input Data Used for Prediction")
+    st.write(input_df)
+
+    # Visualization
+    st.subheader("📈 Input Data Visualization")
+    try:
+        if input_df.shape[0] > 1:
+            st.markdown("Showing distribution of features (for CSV Upload):")
+            sns.set(style="whitegrid")
+            fig = sns.pairplot(input_df)
+            st.pyplot(fig)
+            plt.close()
+        else:
+            st.markdown("Bar chart of individual input (for Manual Input):")
+            fig, ax = plt.subplots()
+            input_df.T.plot(kind='bar', legend=False, ax=ax)
+            plt.xticks(rotation=45)
+            plt.ylabel("Value")
+            st.pyplot(fig)
+            plt.close()
+    except Exception as e:
+        st.warning(f"Could not generate visualization: {e}")
+
+    # --- Make Prediction ---
     try:
         prediction = model_pipeline.predict(input_df)
-        st.subheader("Prediction")
+        st.subheader("🧠 Prediction")
         st.write(prediction)
 
         # Show prediction probabilities if available
@@ -83,14 +101,14 @@ if input_df is not None:
                 proba_df = pd.DataFrame(prediction_proba, columns=model_classes)
             else:
                 proba_df = pd.DataFrame(prediction_proba)
-            st.subheader("Prediction Probability")
+            st.subheader("📊 Prediction Probability")
             st.write(proba_df)
 
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
 
     # --- Show Performance Metrics ---
-    st.subheader("Performance Metrics (Using Test Data)")
+    st.subheader("📈 Model Performance on Test Data")
     try:
         X_test = joblib.load("X_test.pkl")
         y_test = joblib.load("y_test.pkl")
