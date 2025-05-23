@@ -8,7 +8,6 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 # --- Load trained model ---
 try:
     model = joblib.load('best_model_pipeline.pkl')
-    st.success("Model loaded successfully!")
     try:
         model_classes = model.classes_
     except AttributeError:
@@ -23,7 +22,7 @@ except Exception as e:
 
 # --- Define expected feature names ---
 feature_names = ['Condition', 'Condition_TotalPop', 'F_TOTAL', 'RPL_Themes', 'TotalPopulation']
-st.info(f"Model expects {len(feature_names)} features: {', '.join(feature_names)}")
+#st.info(f"Model expects {len(feature_names)} features: {', '.join(feature_names)}")
 
 # --- Title and Input Method ---
 st.title("Social Vulnerability Classification")
