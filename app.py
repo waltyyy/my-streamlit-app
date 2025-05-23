@@ -169,26 +169,25 @@ if input_df is not None:
         st.success("Test data loaded successfully.")
 
     # Make predictions on the test set
-    y_test_pred = model_pipeline.predict(X_test)
+        y_test_pred = model_pipeline.predict(X_test)
 
     # Calculate metrics
-    acc = accuracy_score(y_test, y_test_pred)
-    cm = confusion_matrix(y_test, y_test_pred)
-
+        acc = accuracy_score(y_test, y_test_pred)
+        cm = confusion_matrix(y_test, y_test_pred)
+    
     # Display accuracy
-    st.write(f"**Accuracy on Test Set:** {acc:.2f}")
+        st.write(f"**Accuracy on Test Set:** {acc:.2f}")
 
     # Display confusion matrix
-    fig, ax = plt.subplots()
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax,
-                xticklabels=model_classes, yticklabels=model_classes)
-    plt.xlabel("Predicted Label")
-    plt.ylabel("True Label")
-    st.pyplot(fig)
-    plt.close(fig)
+        fig, ax = plt.subplots()
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax, xticklabels=model_classes, yticklabels=model_classes)
+        plt.xlabel("Predicted Label")
+        plt.ylabel("True Label")
+        st.pyplot(fig)
+        plt.close(fig)
 
-except FileNotFoundError:
-    st.warning("Test data files (X_test.pkl and y_test.pkl) not found. Please upload them to use this feature.")
-except Exception as e:
-    st.error(f"An error occurred while calculating performance metrics: {e}")
+    except FileNotFoundError:
+        st.warning("Test data files (X_test.pkl and y_test.pkl) not found. Please upload them to use this feature.")
+    except Exception as e:
+        st.error(f"An error occurred while calculating performance metrics: {e}")
 # --- End: Fix performance metrics display ---
