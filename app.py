@@ -159,16 +159,14 @@ if input_df is not None:
 
     except Exception as e:
          st.error(f"An error occurred during prediction: {e}")
-
-
-    # --- Start: Fix performance metrics display ---
+        # --- Start: Fix performance metrics display ---
     # Display performance metrics
     st.subheader("Performance Metrics (Using Test Data)")
     try:
     # Load test data from files
-    X_test = joblib.load("X_test.pkl")
-    y_test = joblib.load("y_test.pkl")
-    st.success("Test data loaded successfully.")
+        X_test = joblib.load("X_test.pkl")
+        y_test = joblib.load("y_test.pkl")
+        st.success("Test data loaded successfully.")
 
     # Make predictions on the test set
     y_test_pred = model_pipeline.predict(X_test)
