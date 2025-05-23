@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 
 # --- Load trained model pipeline ---
 try:
-    model_pipeline = joblib.load('best_model_pipeline.pkl')
+    model_pipeline = joblib.load('best_model.pkl')
     st.success("Model pipeline loaded successfully!")
     try:
         model_classes = model_pipeline.named_steps['classifier'].classes_
@@ -15,7 +15,7 @@ try:
         st.warning("Could not retrieve class names from the classifier.")
         model_classes = None
 except FileNotFoundError:
-    st.error("Error: 'best_model_pipeline.pkl' not found. Please upload the model file.")
+    st.error("Error: 'best_model.pkl' not found. Please upload the model file.")
     st.stop()
 except Exception as e:
     st.error(f"An error occurred while loading the model: {e}")
