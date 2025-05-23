@@ -11,7 +11,6 @@ try:
     try:
         model_classes = model_pipeline.named_steps['classifier'].classes_
     except AttributeError:
-        st.warning("Could not retrieve class names from the classifier.")
         model_classes = None
 except FileNotFoundError:
     st.error("Error: 'best_model.pkl' not found. Please upload the model file.")
