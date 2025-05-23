@@ -166,39 +166,33 @@ if input_df is not None:
     # --- Start: Fix performance metrics display ---
     # Display performance metrics
     st.subheader("Performance Metrics (Using Test Data)")
-    # You need access to the original y_test and the predictions made on X_test
-    # This part is tricky in a standalone Streamlit script without access to the original Colab environment variables.
-    # You would typically save y_test and the model's predictions on it, or re-calculate them here.
-    # For demonstration, let's assume X_test and y_test are globally available in the Colab environment
-    # when this script is being run to generate app.py content.
-    # In a real deployment, you'd save X_test and y_test and load them here.
     try:
-        # Check if X_test and y_test are in the global environment
-        X_test_global = globals().get('X_test', None)
-        y_test_global = globals().get('y_test', None)
+    # Load test data from files
+    X_test = joblib.load("X_test.pkl")
+    y_test = joblib.load("y_test.pkl")
+    st.success("Test data loaded successfully.")
 
-        if X_test_global is not None and y_test_global is not None:
-            st.write("Calculating performance on original test set...")
-            # Use X_test directly, pipeline handles scaling
-            y_test_pred_on_load = model_pipeline.predict(X_test_global)
-            acc = accuracy_score(y_test_global, y_test_pred_on_load)
-            cm = confusion_matrix(y_test_global, y_test_pred_on_load)
+    # Make predictions on the test set
+    y_test_pred = model_pipeline.predict(X_test)
 
-            st.write(f"Accuracy on Test Set: {acc:.2f}")
-            fig, ax = plt.subplots()
-            # Use model_classes for labels if available
-            sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax,
-                        xticklabels=model_classes, yticklabels=model_classes)
-            plt.xlabel("Predicted Label")
-            plt.ylabel("True Label")
-            st.pyplot(fig)
-            plt.close(fig) # Close the figure to prevent memory issues
-        else:
-            st.warning("Test data (X_test, y_test) not available to display performance metrics.")
-            st.warning("To see metrics here, ensure X_test and y_test were defined and accessible when saving this script.")
+    # Calculate metrics
+    acc = accuracy_score(y_test, y_test_pred)
+    cm = confusion_matrix(y_test, y_test_pred)
 
-    except Exception as e:
-         st.error(f"An error occurred while calculating performance metrics: {e}")
-    # --- End: Fix performance metrics display ---
+    # Display accuracy
+    st.write(f"**Accuracy on Test Set:** {acc:.2f}")
 
-# --- End: Fix loading and prediction ---
+    # Display confusion matrix
+    fig, ax = plt.subplots()
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax,
+                xticklabels=model_classes, yticklabels=model_classes)
+    plt.xlabel("Predicted Label")
+    plt.ylabel("True Label")
+    st.pyplot(fig)
+    plt.close(fig)
+
+except FileNotFoundError:
+    st.warning("Test data files (X_test.pkl and y_test.pkl) not found. Please upload them to use this feature.")
+except Exception as e:
+    st.error(f"An error occurred while calculating performance metrics: {e}")
+# --- End: Fix performance metrics display ---
